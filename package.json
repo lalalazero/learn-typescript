@@ -1,0 +1,19 @@
+{
+  "name": "learn-typescript",
+  "version": "1.0.0",
+  "description": "`npm i typescript -g` 全局安装 `typescript` 以便于使用 `tsc` 命令",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/lalalazero/learn-typescript.git"
+  },
+  "author": "lalalazero",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/lalalazero/learn-typescript/issues"
+  },
+  "homepage": "https://github.com/lalalazero/learn-typescript#readme"
+}
