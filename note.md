@@ -129,3 +129,51 @@ interface ReadOnlyArray {
 let a: ReadOnlyArray = ['a','b']
 // a[0] = 'aa' // 错误
 ```
+
+## 函数类型接口
+
+声明一个函数的方法
+
+1. 变量定义函数
+`let add(x: number, y: number) => number`
+2. 接口定义函数
+```ts
+interface Add {
+    (x: number, y: number): number
+}
+```
+3. 类型别名定义函数
+```ts
+type Add = (x: number, y: number) => number
+```
+
+函数的实现
+
+```ts
+let add: Add = (a, b) => a + b
+```
+
+## 混合接口
+一个对象同时作为函数和对象使用，并带有额外的属性。在写第三方库的时候，有可能需要用到。
+```ts
+interface Lib {
+    (): void;
+    version: string;
+    doSomething(): void
+}
+
+let lib: Lib = (() => {}) as Lib
+lib.version = '1.0'
+lib.doSomething = () => {}
+```
+
+上述定义方式像全局暴露了一个 Lib 类型，并且是单例模式创建。可以封装一个函数返回 Lib 类型的实例，多次调用就返回多个实例。
+
+```ts
+function getLib(): Lib {
+    let lib: Lib = (() => {}) as Lib
+    lib.version = '1.0'
+    lib.doSomething = () => {}
+    return lib
+}
+```
