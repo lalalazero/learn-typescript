@@ -37,17 +37,21 @@ let compute: (x: number, y: number) => number // 相当于 java 的接口
 compute = (a,b) => a + b // 相当于 java 的实现类
 ```
 
-// 对象
+### 对象
+```ts
 // let obj: object = { x: 1, y: 2 } // 不好
 let obj: {x: number, y: number} = { x: 1, y: 2 }
-// obj.z = '3' // 错误
+// obj.z = '3' // 错误，没有声明z属性不能赋值
+```
 
-// Symbol
+### Symbol
+```ts
 let s1: symbol = Symbol()
 let s2: symbol = Symbol()
 console.log(s1 === s2) // false
-
-// undefined || null
+```
+### undefined || null
+```ts
 let un: undefined = undefined // 只能赋值为 undefined 
 // un = num // 不能赋值给 undefined
 let nu: null = null 
@@ -55,28 +59,46 @@ let nu: null = null
 
 // 如果要把其他类型的值赋值给 unfined || null，需要设置 tsconfig.json 中 strictNullChecks: false
 // 或者在本例中，num 的类型使用联合类型声明
+```
 
-// void 类型
-let noReturn = () => {} // 没有返回值的就是 void 类型，也可以理解返回 undefined 的就是 void 类型。为什么要多此一举呢？
+### void 类型
+```ts
+let noReturn = () => {} // 没有返回值的就是 void 类型，也可以理解返回 undefined 的就是 void 类型。
+```
+有了`undefined`类型为什么还要多此一举声明`void`类型？因为在`js`中`undefined`不是一个保留字，可以被重写，比如：
+```js
+function bar(){
+    var undefined = 'undefined'
+    return undefined
+}
+```
 
-// any
+### any 
+```ts
 let x: any
 x = 1
 x = undefined 
 x = true 
 x = 'string'
+```
+`any`相当于不定义类型，因为任何类型都可以，除非必要否则不应当使用`any`
 
-// never 永远不会有返回值的类型
+### never 永远不会有返回值的类型
+```ts
 let error = () => {
     throw new Error('error')
 }
 let yy = () => { while(true) {} }
+```
 
-// 联合类型
+### 联合类型
+```ts
 let a: string | number | undefined = 'hello'
 a = 1
 a = un // undefined
 
 let arr3: Array<string | number> = ['hello',1,2,'hello']
 arr3 = [1,2,3,4]
+```
+联合类型的关键在于`|`符号
 
