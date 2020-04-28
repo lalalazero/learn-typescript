@@ -31,6 +31,10 @@ let c = [1,2] // number 数组
 ```ts
 let a = [1, null] 
 ```
+看类型不兼容的例子，这里 `number` 和 `string` 是不兼容的，那么 `ts` 就会推断 `b` 的类型为联合类型，也就是 `number | string`。
+```ts
+let b = [1, 'hello']
+```
 
 3. 上下文类型推断
 
@@ -52,3 +56,7 @@ interface Foo {
 // let foo = {} as Foo // bad，写了类型断言但是没有给 bar 赋值很容易 gg
 let foo: Foo = { bar: 1 }
 ```
+
+## 类型兼容
+
+X 类型能被 Y 类型赋值，那么就说 X 兼容 Y。`x = y` X 叫做目标类型，Y 叫做源类型。
