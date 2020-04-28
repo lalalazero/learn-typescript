@@ -1,204 +1,107 @@
-# 类
+# 泛型
 
-## 类的实现
+## 概念
+泛型用来约束函数或者类成员的类型，泛型不是一开始确定的，而是在使用的时候确定的（不是运行时）。泛型的关键字是 T
+
+## 泛型函数
+
+没有泛型之前，假设一个函数要达到支持参数类型为多种类型的情况下，可以使用
+
+1. 函数重载
+2. 联合类型
+
 ```ts
-class Dog {
-    constructor(name: string) {
-        this.name = name
-    }
-    name: string
-    run() {}
+function log(value: string): string 
+function log(value: string[]): string[]
+function log(value: number): number 
+function log(value: number[]): number[]
+function log(value: any): any {
+    return value
 }
-console.log(Dog.prototype)
-let dog = new Dog('wang')
-console.log(dog)
 ```
-1. 无论在 ES 还是 TS，类成员的属性都是实例属性而不是原型属性
-2. 方法挂在原型上，而不是实例上
-3. 实例的属性必须在构造函数中初始化或者给一个初始值
-```ts
-constructor(name: string){
-    this.name = name
-}
-// 或者
-name: string = '一个初始值'
-```
+或者
 
-## 类的继承
-
-1. ES6 规定派生类一定要调用父类的构造函数
-2. this 的调用一定要在 super 调用之后
 ```ts
-class Husky extends Dog {
-    constructor(name: string, color: string) {
-        super(name)
-        this.color = color
-    }
-    color: string
+function log(value: string | string[] | number | number[]): string | string[] | number | number[] {
+    return value
 }
 ```
 
-## 成员修饰符
-
-1. `public` 默认修饰符，没有访问限制
-2. `private` 只能在当前类访问
-3. `protected` 只能在当前类和子类中访问
-4. `readonly` 只读，一定要被初始化(声明的时候或者构造函数里初始化)
-5. `static` 修饰符，修饰静态成员，只能通过类名来调用，不能通过实例调用。
-
-成员修饰符不仅可以用来修饰属性，也能用来修饰方法
-
-`protected` 修饰构造函数，不能在外部 `new` 一个实例，只能在当前类或者子类中初始化，相当于声明了一个基类。
-```ts
-class Base {
-    protected constructor(){
-
-    }
-}
-```
-
-`public` 修饰构造函数的参数，省去了成员属性的额外声明，使代码更简洁。
-```ts
-class Fun {
-    constructor(public foo: string) {
-        this.foo = foo
-    }
-    // foo: string // 这句话被省略了
-}
-```
-
-## 抽象类和多态
+但是这样都不直观，而且冗余代码很多。采用泛型的方式声明一个泛型函数可以用更少的代码实现更多的灵活性。
 
 ```ts
-abstract class Animal {}
-// let animal = new Animal() // 抽象类无法被实例化
-
-class Dog extends Animal {
-    constructor(name: string) {
-        super()
-        this.name = name
-    }
-    run() {}
+function log<T>(value: T): T {
+    return value
 }
+// 不用显示声明返回值类型，ts 会做类型推断
+function log2<T>(value: T) {
+    return value
+}
+console.log(log<string>('hello'))
+console.log(log2<number>(1234))
+console.log(log(['hello','world'])) // 不指定类型，由参数的类型进行推断
+
 ```
 
-1. 抽象类无法被实例化
-2. 抽象类可以有抽象方法，也可以有方法的完整实现
-3. 抽象类的抽象方法被多个不同的子类实现后，产生多态
+还可以结合 `type` 关键字声明一个函数类型
 
 ```ts
-abstract class Animal {
-    abstract sleep(): void
-}
-// let animal = new Animal() // 抽象类无法被实例化
-
-class Dog extends Animal {
-    constructor(public name: string) {
-        super()
-        this.name = name
-    }
-    run() { }
-    sleep() {
-        console.log('Dog sleep')
-    }
-}
-class Cat extends Animal {
-    constructor() {
-        super()
-    }
-    sleep() {
-        console.log('Cat sleep')
-    }
-}
-
-[new Dog('xx'), new Cat()].forEach(animal => animal.sleep()) // 多态
+type Log = <T>(value: T) => T 
+let mylog: Log = value => value
+console.log(mylog('hello'))
+console.log(mylog(1234))
+console.log(mylog(['hello','world']))
 ```
 
-## 类与接口的关系
+## 泛型接口
 
-1. 类`implements`（实现）接口 ， 类`extends`(继承)类，接口`extends`（继承）接口，接口`extends`（继承）类。
-1. 类实现接口的时候必须实现接口中所有的东西
-2. 接口只能约束类的公有成员，也就是`public`属性和方法。（参见第二点）
-3. 但是接口无法约束类的构造函数
+泛型接口类似用 `type` 关键字声明一个函数类型。
+
+带默认类型的泛型接口。
 ```ts
-interface Human {
-    // new (): void // 硬写会导致 Asian 提示报错
-    name: string,
-    eat(): void
+interface Log<T = string> {
+    (value: T): T
 }
 
-class Asian implements Human {
-    constructor() {
-        this.name = ''
+let myLog: Log = value => value
+console.log(myLog('hello'))
+```
+
+## 泛型类
+
+1. 泛型不能约束类的静态成员
+
+```ts
+class Log<T> {
+    run(value: T) {
+        console.log(value)
+        return value
     }
-    name: string
-    eat() {}
 }
+
+let log = new Log<number>()
+log.run(1234)
+
+let log2 = new Log() // 不指定类型就是 any
+log2.run(1234)
+log2.run('hello')
+log2.run(['hello','world'])
 ```
 
-## 接口的继承
+## 泛型约束
 
-1. 接口继承接口
+泛型可以继承接口，指定某种条件下的泛型，这叫做泛型约束。
+
 ```ts
-interface Human {
-    // new (): void // 硬写会导致 Asian 提示报错
-    name: string,
-    eat(): void
+interface Len {
+    length: number
+}
+function log<T extends Len>(value: T) {
+    console.log(value, value.length)
 }
 
-interface Man extends Human {
-    run(): void
-}
-
-interface Child {
-    grow(): void
-}
-
-interface Boy extends Child, Man { }
-
-let boy: Boy = {
-    name: 'Human',
-    eat() { },
-    grow() { },
-    run() { }
-}
+log([1, 2, 3])
+log('hello')
+log({ a: 'hello', b: 'world', length: 2 })
+// log(123) // 没有 length 属性，会报错
 ```
-2. 接口继承类
-
-当接口继承一个类时，会继承包括`public`、`private`、`protected`属性的成员，但是没有具体实现。并且由于 `private` 类属性只能限定当前类访问，所以如果接口A继承类B，实际上这个接口只能由类B类来实现。同理如果存在 `protected` 属性，那么这个接口只能由当前类和类的子类来实现(`implements`)
-
-## 接口和类之间实现和继承的关系
-
-- 类可以继承（多个）类 `extends`
-- 接口可以继承（多个）接口 `extends`
-- 接口可以继承类 `extends`
-    - `public` `private` `protected` 的成员都会继承，但是没有具体实现，相当于抽离出类型
-- 类可以实现接口 `implements`
-    - 必须实现接口所有的`public`属性
-        - 接口自己定义的
-        - 接口从别的接口继承的
-        - 接口从别的类继承的
-    - 如果接口隐式含有 `private` 和 `protected` 属性
-        - 只能由接口继承的类或者它的子类来实现这个接口
-```ts
-class Auto {
-    state = 1
-    // protected secret = 0
-}
-interface AutoInterface extends Auto {
-    state2: number
-
-}
-class C implements AutoInterface {
-    state = 2
-    state2 = 3
-}
-// 如果 Auto 的 protected 属性放开，那么 AutoInterface 接口只能由 Bus 来实现，C 不能实现
-class Bus extends Auto implements AutoInterface {
-    state = 3
-    state2 = 4
-    // secret = 0
-}
-console.log(new Bus())
-```
-

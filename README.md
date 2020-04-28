@@ -6,3 +6,4 @@
 - [demo-2](https://github.com/lalalazero/learn-typescript/blob/demo-2/note.md) 接口 
 - [demo-3](https://github.com/lalalazero/learn-typescript/blob/demo-3/note.md) 函数 
 - [demo-4](https://github.com/lalalazero/learn-typescript/blob/demo-4/note.md) 类
+- [demo-5](https://github.com/lalalazero/learn-typescript/blob/demo-5/note.md) 泛型
