@@ -53,10 +53,135 @@ interface Foo {
     bar: number
 }
 
-// let foo = {} as Foo // bad，写了类型断言但是没有给 bar 赋值很容易 gg
+// let foo = {} as Foo // bad，写了类型断言但是没有给 bar 赋值很容易 gg（ts 也不会提示你这里 bar 没有赋值，就很容易 gg）
 let foo: Foo = { bar: 1 }
 ```
 
 ## 类型兼容
 
+1. null 和 undefined 兼容
+2. 接口兼容
+3. 函数兼容
+
+### null 和 undefined 兼容
+
 X 类型能被 Y 类型赋值，那么就说 X 兼容 Y。`x = y` X 叫做目标类型，Y 叫做源类型。
+
+在关闭了 `tsconfig.json` 中的 `strictNullChecks` 之后，可以把 `null` 赋值给字符串 `string` 类型，这样的转换可以给代码提供更多的灵活性。
+
+```ts
+let s: string = 'a'
+s = null
+```
+
+### 接口兼容
+
+成员少的接口兼容成员多的接口。
+
+```ts
+interface X {
+    a: any,
+    b: any
+}
+
+interface Y {
+    a: any,
+    b: any,
+    c: any
+}
+let x: X = {
+    a: '1',
+    b: '2'
+}
+
+let y: Y = {
+    a: '1',
+    b: '2',
+    c: '3'
+}
+
+x = y  // 兼容
+// y = x  // 不兼容
+```
+
+### 函数兼容
+
+函数兼容也发生在两个函数进行赋值的时候，比如函数作为参数值进行传递。
+函数兼容必须满足 3 个条件：
+
+1. 参数个数
+2. 参数类型
+3. 返回值类型
+
+#### 参数个数
+
+- 参数个数固定
+
+    当参数个数固定时，参数个数必须小于或者等于才兼容。
+    ```ts
+    type Handler = (a: number, b: number) => void
+
+    // 高阶函数 hof
+    function hof(handler: Handler) {
+        return handler
+    }
+
+    let handler1 = (a: number) => { }
+    hof(handler1)
+    let handler2 = (a: number, b: number) => { }
+    hof(handler2)
+    let handler3 = (a: number, b: number, c: number) => { }
+    // hof(handler3) // 不兼容
+    ```
+
+- 可选参数和剩余参数
+
+    1. 固定参数兼容可选和剩余参数。
+    2. 可选兼容固定和剩余，剩余兼容固定和可选（需要关闭 `strictFunctionTypes` 选项。但是我在 `playground` 测试的时候，v3.8.3 关不关都不影响）
+
+    ```ts
+    let a = (p1: number, p2: number) => {}
+    let b = (p1?: number, p2?: number) => {}
+    let c = (...args: number[]) => {}
+
+    a = b
+    a = c 
+    b = a
+    b = c
+    c = a 
+    c = b
+    ```
+#### 参数类型
+
+显然类型要一致否则不兼容。
+
+- 基础类型
+
+```ts
+let handler4 = (a: string) =>  {}
+// hof(handler4) // string 类型不能兼容 number 类型
+```
+
+- 复杂类型
+
+```ts
+interface Point3D {
+    x: number,
+    y: number,
+    z: number
+}
+
+interface Point2D {
+    x: number,
+    y: number
+}
+
+let p3d = (point: Point3D) => { }
+let p2d = (point: Point2D) => { }
+
+// p2d = p3d // 不兼容
+p3d = p2d // 函数参数的双向协变，精确的 --> 不那么精确的
+```
+
+#### 返回值类型
+
