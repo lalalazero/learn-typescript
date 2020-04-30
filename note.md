@@ -179,9 +179,147 @@ interface Point2D {
 let p3d = (point: Point3D) => { }
 let p2d = (point: Point2D) => { }
 
-// p2d = p3d // 不兼容
-p3d = p2d // 函数参数的双向协变，精确的 --> 不那么精确的
+// p2d = p3d // 不兼容,除非关闭 strictFunctionsTypes 选项。将一个精确的参数 --> 不那么精确的参数叫做函数参数的双向协变
+p3d = p2d // 兼容。可以理解为3个参数兼容2个参数，也就是参数多的兼容参数少的。
 ```
 
 #### 返回值类型
+
+返回值类型必须相同或者是子类型。
+
+```ts
+let f = () => ({ name: 'alice' })
+let g = () => ({ name: 'Bob', age: 11 })
+f = g
+// g = f
+```
+
+### 枚举兼容性
+
+不同的枚举不兼容，枚举和 `number` 兼容。（枚举的值本身也是从 0 自增）
+
+```ts
+enum Fruit {
+    Apple, Banana
+}
+enum Color {
+    Red,
+    Yellow
+}
+
+let fruit: Fruit = Fruit.Apple 
+fruit = 3
+let no: Number = Fruit.Apple
+
+// let color: Color.Red = Fruit.Banana
+```
+
+### 类兼容性
+
+静态成员和构造函数是不参与类兼容性比较的。当具有相同的实例属性时，两个类兼容。
+
+```ts
+class A {
+    constructor(p: number, q: number) { }
+    id: number = 1
+}
+class B {
+    static $ = 1
+    constructor(p: number) { }
+    id: number = 2
+}
+let a = new A(1, 2)
+let b = new B(1)
+a = b
+b = a
+```
+
+如果类中含有 `private` 私有成员，那么两个类是不兼容的。只有父子类才可以兼容。
+
+```ts
+class A {
+    constructor(p: number, q: number) { }
+    id: number = 1
+    private name: string = ''
+}
+class B {
+    static $ = 1
+    constructor(p: number) { }
+    id: number = 2
+}
+let a = new A(1, 2)
+let b = new B(1)
+// a = b // A 类中有私有成员 name，无法兼容 b
+b = a
+
+class C extends A{
+    constructor(p: number) { super(p, 1)}
+}
+let c = new C(1)
+c = a
+a = c
+```
+
+### 泛型兼容性
+
+#### 泛型接口
+
+泛型接口的兼容性取决于：
+- 接口是否含有成员
+- 泛型 T 是否一致
+
+```ts
+interface Empty<T> {
+
+}
+
+let obj1: Empty<number> = {}
+let obj2: Empty<string> = {}
+obj1 = obj2
+obj2 = obj1
+
+interface NotEmpty<T> {
+    value: T
+}
+
+let obj3: NotEmpty<number> = { value: 1 }
+let obj4: NotEmpty<string> = { value: 'hello' }
+// 泛型接口不为空时，T 不一样完全不兼容
+// obj3 = obj4 
+// obj4 = obj3
+
+interface Optional<T> {
+    value?: T
+}
+
+let obj5: Optional<number> = {}
+let obj6: Optional<number> = { value: 1 }
+obj5 = obj6
+obj6 = obj5
+```
+
+#### 泛型函数
+
+同样的，在没有指定 T 类型的时候，泛型函数之间是完全兼容的。
+
+```ts
+let log1 = <T>(x: T): T => {
+    console.log('x')
+    return x
+}
+
+let log2 = <U>(x: U): U => {
+    console.log('y')
+    return x
+}
+
+log1 = log2 
+log2 = log1
+```
+
+
+兼容性整体总结：
+1. 结构比较——成员少的兼容成员多的。
+2. 函数比较——参数多的兼容参数少的。
+
 
