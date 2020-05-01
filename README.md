@@ -8,3 +8,4 @@
 - [demo-4](https://github.com/lalalazero/learn-typescript/blob/demo-4/note.md) 类
 - [demo-5](https://github.com/lalalazero/learn-typescript/blob/demo-5/note.md) 泛型
 - [demo-6](https://github.com/lalalazero/learn-typescript/blob/demo-6/note.md) 类型检查机制
+- [demo-7](https://github.com/lalalazero/learn-typescript/blob/demo-7/note.md) 类型保护 
