@@ -11,3 +11,4 @@
 - [demo-7](https://github.com/lalalazero/learn-typescript/blob/demo-7/note.md) 类型保护 
 - [demo-8](https://github.com/lalalazero/learn-typescript/blob/demo-8/note.md) 高级类型
 - [demo-9](https://github.com/lalalazero/learn-typescript/blob/demo-9/note.md) ts对es模块和commonjs模块的支持
+- [demo-10](https://github.com/lalalazero/learn-typescript/blob/demo-10/note.md) 命名空间
