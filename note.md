@@ -141,17 +141,35 @@ console.log(getValue(obj, ['e','f']))
 ```
 当访问 `obj` 没有的 `key`,比如 `e` `f` 的时候，输出的是`[undefined, undefined]` 数组，但是 `ts` 并没有报错。如何修改并增加 `ts` 的约束？
 
-1. 索引类型的查询操作符 `keyof T` 
+1. 索引类型的查询操作符 `keyof T` 表示类型 T 的所有公共属性的字面量的联合类型（有点绕 = =) 
+
+    ```ts
+    interface Obj {
+        a: number,
+        b: string
+    }
+    let key: keyof Obj 
+    ```
+    这里 key 的类型就是 `'a' | 'b'` 字面量联合类型
+
+2. `T[K]` 表示对象属性的类型。比如 `let value: Obj['a']` 这里 `value` 的类型就是 `number`
+
+3. 泛型约束 `T extends U`
+
+我们用上述 1,2,3 点对 `getValues` 函数进行改造。
 
 ```ts
-interface Obj {
-    a: number,
-    b: string
+let obj = {
+    a: 1,
+    b: 2,
+    c: 3
 }
-let key: keyof Obj 
-// key 的类型就是 'a' | 'b'， 字面量联合类型
+function getValue<T, K extends keyof T>(obj: T, keys: K[]): T[K][] {
+    return keys.map(key => obj[key])
+}
+
+console.log(getValue(obj, ['a', 'b']))
+// console.log(getValue(obj, ['e','f'])) // ts 会提示报错 e f 不属于 obj 的属性
 ```
-    
 
-2. 
-
+改造之后的函数对对象、对象属性以及对象属性返回的值类型做了一个约束。
