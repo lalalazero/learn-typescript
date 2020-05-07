@@ -122,7 +122,35 @@ export { str as hello } from './b';
 
 还可以继续指定 `tsc a.ts -m amd` 和 `tsc a.ts -m umd` 查看编译后的效果。
 
+3. 对于默认导出的处理。
 
+假如有一个 es 模块 `foo.ts`，内容是 
+```ts
+export default function(){ console.log('foo') }
+```
+默认导出了一个函数。如果在 commonjs 模块比如 `bar.ts` 中引入这个模块并使用它，需要这么写：
+```js
+var foo = require('foo') // 假定文件名是这个
+foo.default() 
+```
+运行 `ts-node bar.ts` 才能正确看到输出。这是因为 `tsconfig.json` 的默认配置通常是 `module: commonjs` 和 `target: es5`，经过编译后 es 模块的默认导出被挂载到了 commonjs 模块的 `default` 属性上。
+
+针对上面的情况，es 提供了另外一种写法。
+```ts
+export = function() { console.log('foo' )}
+```
+
+相应的，commonjs 中可以直接写:
+```ts
+import foo = require('foo')
+foo()
+```
+
+如果打开了 `tsconfig.json` 配置中的 `esModuleInterop` 属性，那么还可以写成
+```ts
+import foo from 'foo'
+foo()
+```
 
 
 
