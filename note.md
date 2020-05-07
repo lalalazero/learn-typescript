@@ -1,8 +1,11 @@
 # 高级类型
 
-1. 交叉类型 &
-2. 联合类型 |
-3. 索引类型
+1. 交叉类型 `&`
+2. 联合类型 `|`
+3. 索引类型 `keyof T ` `T[K]` `T extends U`
+4. 映射类型 `Partial<T>` `Readonly<T>` `Pick<T>` `Record<T,U>`
+5. 条件类型 `Exclude<T,U>` `NotNullable<T>` `Extract<T,U>`
+6. `ReturnType<T>`
 
 
 ## 交叉类型
@@ -218,5 +221,61 @@ RecordObj 得到的新的类型为：
     y: Obj
 }
 ```
+
+## 条件类型
+
+`T extends U ? X : Y`，如果 T 可以被赋值给类型 U，那么结果类型就是 X，否则就是 Y
+
+条件类型使得类型可以具备不唯一性，更加灵活。
+
+```ts
+type TypeName<T> = 
+    T extends string ? "string" : 
+    T extends number ? "number" :
+    T extends boolean ? "boolean" :
+    T extends undefined ? "undefined" :
+    T extends Function ? "function" :
+    "object"
+type T1 = TypeName<string>  // T1=string
+type T2 = TypeName<string[]> // T2=object
+```
+
+分布式条件类型：`(A | B) extends U ? X : Y`
+
+拆解之后等同于： `(A extends U ? X : Y) | (B extends U ? X : Y)`
+
+```ts
+type T3 = TypeName<string | string[]> // T3='string' | 'object' 联合类型
+```
+
+分布式条件类型可以用来过滤类型。
+```ts
+type Filter<T, U> = T extends U ? never : T 
+type T4 = Filter<'a' | 'b' | 'c', 'a' | 'e'> // T4='b' | 'c'
+```
+拆解类型过滤的过程：
+```ts
+Filter<'a' | 'b' | 'c', 'a' | 'e'> === 
+Filter<'a', 'a' | 'e'> | Filter<'b', 'a' | 'e'> | Filter<'c', 'a' | 'e'> ===
+never | "b" | "c" ==== "b" | "c" // 就是 T4 的类型
+```
+
+过滤 `undefined` 和 `null` 的例子：
+
+```ts
+type NotNull<T> = Filter<T, undefined | null>
+type T5 = NotNull<string | number | undefined | null>
+```
+
+实际上 `Filter` 和 `NotNull` 都有官方的类型预定义，分别是 `Exclude<T,U>` 类型和 `NonNullable<T>` 类型。其他类型常见的有 `Extract<T,U>`，例如：
+```ts
+type T6 = Extract<"a" | "b" | "c", "a" | "e">
+```
+
+
+## ReturnType<T> 获取一个函数返回值的类型
+
+`type T7 = ReturnType<() => string>` T7 的类型就是 `string`
+
 
 
