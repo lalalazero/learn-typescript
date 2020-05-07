@@ -173,3 +173,50 @@ console.log(getValue(obj, ['a', 'b']))
 ```
 
 改造之后的函数对对象、对象属性以及对象属性返回的值类型做了一个约束。
+
+## 映射类型
+
+从一个类型衍生得到另一个类型。本质上是一系列预先定义的泛型接口。
+
+举个例子，得到一个类型的只读版。
+```ts
+interface Obj {
+    a: string,
+    b: number,
+    c: boolean
+}
+
+type ReadonlyObj = Readonly<Obj>
+```
+通过 ts 预定义的 `Readonly` 类型(在 `lib.es5.d.ts` 文件中定义的），得到了 `ReadonlyObj` 类型，它的属性和 `Obj` 完全一样，只是每个属性都是只读的。
+
+Readonly 预定义类型的实现：
+```ts
+/**
+ * Make all properties in T readonly
+ */
+type Readonly<T> = {
+    readonly [P in keyof T]: T[P];
+};
+```
+
+其他常用类型举例：
+```ts
+type PartialObj = Partial<Obj> // 得到所有属性可选的 PartialObj 类型
+type PickObj = Pick<Obj, 'a' | 'b'> // 抽取属性的子集
+
+```
+以上是同派接口，作用于 Obj 类型，区别于非同派接口，比如 `Record` 预定义类型。
+
+```ts
+type RecordObj = Record<'x' | 'y', Obj>
+```
+RecordObj 得到的新的类型为：
+```ts
+{
+    x: Obj,
+    y: Obj
+}
+```
+
+
