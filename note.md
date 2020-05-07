@@ -1,41 +1,81 @@
-# 命名空间 namespace
+# 声明合并
 
-- 命名空间很好的解决了全局变量污染的问题
-- 自从 es 模块化标准出来之后，命名空间的作用发挥其实不太大了，因为 es 模块化很好的处理了这个问题
-- 但是在使用一些全局的类库的时候，声明命名空间仍然是很有用的
-- 命名空间应当声明在全局环境中，而不应该在 es 模块内混用
-- 相同的命名空间即便声明在两个不同的 `.ts` 文件中，也是可以合并的，相当于只有一个同名的命名空间
-- `///` 三斜线引用，用来引用声明其他命名空间的文件
+## 接口合并
 
-    ```ts
-    /// <reference path="a.ts" />
+1. 同名的接口哪怕位于不同的 .ts 文件都会进行声明合并
+2. 接口的成员属性可以定义多次，但是类型必须相同，类型不同不被允许
+3. 接口的成员函数会重载，重载顺序遵从：
+    - 接口内部按照书写顺序排列
+    - 写在前面的接口函数顺序排在后面
+    - 函数参数是字符串字面量的顺序排在第一位
 
-    namespace Shape {
-        export function circle(x: number) {
-            return Math.PI * x ** 2
-        }
+## 命名空间的合并
+
+### 命名空间和命名空间的合并
+
+1. 命名空间导出的函数和变量是不能重复定义的(想想闭包的原理)
+```ts
+namespace Foo {
+    export function hello() {
+        console.log('hello')
     }
+    export const a = 'aaa'
+}
+namespace Foo {
+    export function bar() {
+        console.log('bar')
+    }
+    // 不允许重复定义导出的函数和变量，这点和接口的合并不同
+    // export function hello() {
+    //     console.log('world')
+    // }
+    // export const a = 'aa'
+}
+```
 
-    Shape.circle(1)
-    Shape.square(1)
-    ```
-    编译这个命名空间文件，其实会发现就是闭包和立即执行函数。
+### 命名空间和函数的合并
 
-    ```js
-    /// <reference path="a.ts" />
-    var Shape;
-    (function (Shape) {
-        function circle(x) {
-            return Math.PI * Math.pow(x, 2);
-        }
-        Shape.circle = circle;
-    })(Shape || (Shape = {}));
-    Shape.circle(1);
-    Shape.square(1);
-    ```
+```ts
+function Lib() { }
+namespace Lib {
+    export const version = '1.0'
+}
+console.log(Lib.version)
+```
+- 相当于给函数增加属性，这在 js 中也是常见的。
+- 一定要先写函数再写命名空间(why?)。
 
-- 给命名空间函数起别名，避免每次都要带命名空间的前缀
-    ```ts
-    import circle = Shape.circle
-    console.log(circle(2))
-    ```
+>个人理解就像不能写这样的代码，先写命名空间相当于声明了一个对象，再写函数相当于声明了一个相同的标志符，肯定是不行的。
+```js
+var foo = 123
+function foo(){}
+```
+
+### 命名空间和类的合并
+
+```ts
+class C {
+
+}
+namespace C {
+    export const staticState = 1
+}
+console.log(C.staticState)
+```
+- 相当于给类增加了静态属性
+- 一定要先写类再写命名空间。（why?)
+>参见上一条分析，类的本质也是构造函数嘛。
+
+### 命名空间和枚举的合并
+
+```ts
+enum Color {
+    Red,
+    Yellow
+}
+namespace Color {
+    export function mix() {}
+}
+console.log(Color)
+```
+
