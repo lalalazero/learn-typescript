@@ -2,6 +2,7 @@
 
 1. 交叉类型 &
 2. 联合类型 |
+3. 索引类型
 
 
 ## 交叉类型
@@ -123,4 +124,34 @@ function area(s: Shape) {
     }
 }
 ```
+
+## 索引类型
+```ts
+let obj = {
+    a: 1,
+    b: 2,
+    c: 3
+}
+function getValue(obj: any, keys: string[]) {
+    return keys.map(key => obj[key])
+}
+
+console.log(getValue(obj, ['a', 'b']))
+console.log(getValue(obj, ['e','f']))
+```
+当访问 `obj` 没有的 `key`,比如 `e` `f` 的时候，输出的是`[undefined, undefined]` 数组，但是 `ts` 并没有报错。如何修改并增加 `ts` 的约束？
+
+1. 索引类型的查询操作符 `keyof T` 
+
+```ts
+interface Obj {
+    a: number,
+    b: string
+}
+let key: keyof Obj 
+// key 的类型就是 'a' | 'b'， 字面量联合类型
+```
+    
+
+2. 
 
