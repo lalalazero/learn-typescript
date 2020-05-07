@@ -10,3 +10,4 @@
 - [demo-6](https://github.com/lalalazero/learn-typescript/blob/demo-6/note.md) 类型检查机制
 - [demo-7](https://github.com/lalalazero/learn-typescript/blob/demo-7/note.md) 类型保护 
 - [demo-8](https://github.com/lalalazero/learn-typescript/blob/demo-8/note.md) 高级类型
+- [demo-9](https://github.com/lalalazero/learn-typescript/blob/demo-9/note.md) ts对es模块和commonjs模块的支持
