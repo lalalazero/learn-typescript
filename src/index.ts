@@ -1,7 +1,3 @@
-interface Obj {
-    a: string,
-    b: number,
-    c: boolean
-}
+import $ from 'jquery'
 
-type ReadonlyObj = Readonly<Obj>
+$('#app').css('color', 'red')
