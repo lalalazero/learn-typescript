@@ -1,0 +1,1 @@
+umdLib.doSomething()
