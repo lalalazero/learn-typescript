@@ -133,9 +133,10 @@ export default function(){ console.log('foo') }
 var foo = require('foo') // 假定文件名是这个
 foo.default() 
 ```
-运行 `ts-node bar.ts` 才能正确看到输出。这是因为 `tsconfig.json` 的默认配置通常是 `module: commonjs` 和 `target: es5`，经过编译后 es 模块的默认导出被挂载到了 commonjs 模块的 `default` 属性上。
+运行 `ts-node bar.ts` 才能正确看到输出。这是因为 `tsconfig.json` 的默认配置通常是 `module: commonjs` 和 `target: es5` <del>经过编译后 es 模块的默认导出被挂载到了 commonjs 模块的 `default` 属性上。</del> `commonjs` 的导出就是 `module.exports` 对象，所以 es6 的 `export default` 经过转换，就相当于在 `module.exports` 对象上加了一个 `default` 属性，并且这个属性值刚好是一个函数。
 
 针对上面的情况，es 提供了另外一种写法。
+
 ```ts
 export = function() { console.log('foo' )}
 ```
