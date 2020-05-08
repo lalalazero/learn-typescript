@@ -13,3 +13,4 @@
 - [demo-9](https://github.com/lalalazero/learn-typescript/blob/demo-9/note.md) ts对es模块和commonjs模块的支持
 - [demo-10](https://github.com/lalalazero/learn-typescript/blob/demo-10/note.md) 命名空间
 - [demo-11](https://github.com/lalalazero/learn-typescript/blob/demo-11/note.md) 声明合并
+- [demo-12](https://github.com/lalalazero/learn-typescript/blob/demo-12/note.md) 编写声明文件 .d.ts
