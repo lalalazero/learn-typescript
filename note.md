@@ -86,3 +86,79 @@
 ```
 
 ## ts3 新特性 工程引用
+
+以一个可能混杂多个工程（客户端代码、服务端代码、抽取的公共代码，但是只有一个 tsconfig.json 配置的项目的目录结构为例：
+```
+src
+  |--common
+      |--index.ts
+  |--client
+      |--index.ts
+  |--server
+      |--index.ts
+test
+  |--client.test.ts
+  |--server.test.ts
+tsconfig.json
+```
+
+存在问题：
+1. 打包后的目录 dist 存在 src 和 test 目录，但事实上 test 不应该打包到 dist 目录
+  - 如果要去掉 test 只能通过配置 include:"src" 或者 exclude:"test"，但是这样会带来 test 不编译，我们的目的还是要编译 test，只是不输出到 dist 目录
+2. 不能单独的构建 server 或者 client 或者 test
+
+通过工程引用进行优化，不仅可以更灵活的指定输出目录，还可以将原来的大工程进行拆分，拆分出来的多个小工程每个可以单独编译，也可以指定其他工程的依赖，编译的时候一起编译，同时还能指定增量编译提高编译速度。
+
+新目录结构，server client test 都拆分成单独的工程，每个都有自己的 tsconfig.json 配置：
+```
+src
+  |--common
+      |--index.ts
+      |--tsconfig.json
+  |--client
+      |--index.ts
+      |--tsconfig.json
+  |--server
+      |--index.ts
+      |--tsconfig.json
+test
+  |--client.test.ts
+  |--server.test.ts
+  |--tsconfig.json
+tsconfig.json
+```
+
+最外层 tsconfig.json 配置必须要有
+```json
+{
+  "compilerOptions": {
+    "composite": true, // 工程可以被引用和进行增量编译
+    "declaration": true // 必须开启
+  }
+}
+```
+拆分的子工程通过 extends 继承外层配置，可以单独指定 outDir 输出目录，通过 reference 指定依赖的其他工程。
+```json
+{
+    "extends": "../../tsconfig.json",
+    "compilerOptions": {
+        "outDir": "../../dist/server",
+    },
+    "references": [
+        {
+            "path": "../common"
+        }
+    ]
+}
+```
+
+需要注意构建的时候应当使用 --build 模式，也可以简写为 -b 然后接要构建的工程目录，比如：`tsc -b src/server --verbose` (--verbose 开启打印构建信息) 由于会开启增量编译，所以第二次编译会快很多。同时由于 server 依赖 common ，所以 common 也会被编译。输出的文件可以开启 `--clean` 进行清理。
+
+如果不使用 --build 模式，直接运行 `tsc` 编译，那么会把当前目录下的所有 ts 在相同位置编译生成 js 文件，同时由于开启了 "declaration":true 也会生成 .d.ts 声明文件。 
+
+总结：工程引用解决了
+- 构建输出目录可以自定义
+- 单个工程可以单独构建
+- 开启增量编译提高编译速度
+
+[microsoft/TypeScript](https://github.com/microsoft/TypeScript) 官方代码库已启用工程引用，可以参考官方配置探索 ts 本身项目是如何组织和编译的。
