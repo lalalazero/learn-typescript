@@ -6,6 +6,17 @@
 
 当 tsconfig.json 的配置为空时，运行 `tsc` 命令时，ts 会按照默认的配置编译当前目录下的 `.ts` `.d.ts` `.tsx` 文件。
 
+
+## 文件选项相关的配置
+
+- files 需要编译的单个文件列表
+- include 需要编译的文件或者目录
+- exclude 需要排除的文件或者目录
+
+  三者的配置会合并生效。include / exclude 支持通配符，比如 "src/*" 只编译 src 下的一级目录，"src/*/*" 只编译 src 下的二级目录的内容。
+
+- extends 配置文件的继承
+
 ## 编译相关的配置
 
 ```json
@@ -37,7 +48,7 @@
 
       // "removeComments": true,    // 删除注释
 
-      // "noEmit": true,            // 不输出文件
+      // "noEmit": true,            // 不输出文件(比如只需要tsc做类型检查，不需要tsc编译，有其他编译工具如babel负责编译ts)
       // "noEmitOnError": true,     // 发生错误时不输出文件
 
       // "noEmitHelpers": true,     // 不生成 helper 函数，需额外安装 ts-helpers
@@ -74,3 +85,4 @@
 }
 ```
 
+## ts3 新特性 工程引用
