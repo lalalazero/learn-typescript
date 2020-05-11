@@ -1,5 +1,6 @@
 const HtmlWebpackPlugin = require('html-webpack-plugin')
 // const ForkTsCheckerWebpackPlugin = require('fork-ts-checker-webpack-plugin')
+const { CheckerPlugin } = require('awesome-typescript-loader')
 module.exports = {
     entry: './src/index.ts',
     output: {
@@ -26,6 +27,7 @@ module.exports = {
         new HtmlWebpackPlugin({
             template: './src/tpl/index.html'
         }),
+        new CheckerPlugin()
         // new ForkTsCheckerWebpackPlugin()
     ]
 }
