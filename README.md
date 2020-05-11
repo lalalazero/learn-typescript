@@ -18,3 +18,4 @@
     - 文件选项
     - 编译选项
     - ts3 新特性：工程引用
+- [demo-14](https://github.com/lalalazero/learn-typescript/blob/demo-14/note.md) 编译工具：ts-loader 和 babel

@@ -1,164 +1,33 @@
-# tsconfig.json 配置
+# 编译工具 ts-loader 和 babel
 
-## 准备工作
+## ts-loader
 
-清空之前的 demo 练习的东西，清空 tsconfig.json ，只留下空的一对 {}。
+1. 内部用的 `tsc` 编译，官网血统，新项目推荐用。
+2. transpileOnly 选项，开启后只做编译不做类型检查
+3. 配合 fork-ts-checker-webpack-plugin 独立的类型检查进程
 
-当 tsconfig.json 的配置为空时，运行 `tsc` 命令时，ts 会按照默认的配置编译当前目录下的 `.ts` `.d.ts` `.tsx` 文件。
+## awesome-typescript-loader
 
+针对官网编译器编译速度太慢，做了缓存和优化，更适合和 babel 集成
 
-## 文件选项相关的配置
+1. 内置独立的类型检查进程 (CheckerPlugin)
+2. transpileOnly 选项同 ts-loader
 
-- files 需要编译的单个文件列表
-- include 需要编译的文件或者目录
-- exclude 需要排除的文件或者目录
+## babel
+利用  babel 强大的生态插件做 ts 的编译，需要用到的插件有：
+- `@babel/preset-typescript`
+- `@babel/proposal-class-properties` 这个插件用来支持写 class
+- `@babel/proposal-object-rest-spread` 这个插件用来支持 ... 扩展运算符
 
-  三者的配置会合并生效。include / exclude 支持通配符，比如 "src/*" 只编译 src 下的一级目录，"src/*/*" 只编译 src 下的二级目录的内容。
+由于 babel 只做 ts 的编译，也就是语言转换，所以需要单独一个进程开启来做类型检查，这里还是用 `tsc --watch ` 模式随时对修改的文件做类型检查。
 
-- extends 配置文件的继承
+同时 babel 存在无法编译的 ts 特性，分别有：
+1. namespace
+    >不要在 babel 编译 ts 的项目里写命名空间
+2. `<typename>` 类型断言
+    > 改用 as 关键字做类型断言 `as typename`
+3. const enum
+    > 以后会支持
+4. export = 
+    > 不写这个语法
 
-## 编译相关的配置
-
-```json
-{
-  "compilerOptions": {
-      // "incremental": true,                // 增量编译
-      // "tsBuildInfoFile": "./buildFile",   // 增量编译文件的存储位置
-      // "diagnostics": true,                // 打印诊断信息
-
-      // "target": "es5",           // 目标语言的版本
-      // "module": "commonjs",      // 生成代码的模块标准
-      // "outFile": "./app.js",     // 将多个相互依赖的文件生成一个文件，可以用在 AMD 模块中
-
-      // "lib": [],                 // TS 需要引用的库，即声明文件，es5 默认 "dom", "es5", "scripthost"
-
-      // "allowJs": true,           // 允许编译 JS 文件（js、jsx）
-      // "checkJs": true,           // 允许在 JS 文件中报错，通常与 allowJS 一起使用
-      // "outDir": "./out",         // 指定输出目录
-      // "rootDir": "./",           // 指定输入文件目录（用于输出）
-
-      // "declaration": true,         // 生成声明文件
-      // "declarationDir": "./d",     // 声明文件的路径
-      // "emitDeclarationOnly": true, // 只生成声明文件
-      // "sourceMap": true,           // 生成目标文件的 sourceMap
-      // "inlineSourceMap": true,     // 生成目标文件的 inline sourceMap
-      // "declarationMap": true,      // 生成声明文件的 sourceMap
-      // "typeRoots": [],             // 声明文件目录，默认 node_modules/@types
-      // "types": [],                 // 声明文件包
-
-      // "removeComments": true,    // 删除注释
-
-      // "noEmit": true,            // 不输出文件(比如只需要tsc做类型检查，不需要tsc编译，有其他编译工具如babel负责编译ts)
-      // "noEmitOnError": true,     // 发生错误时不输出文件
-
-      // "noEmitHelpers": true,     // 不生成 helper 函数，需额外安装 ts-helpers
-      // "importHelpers": true,     // 通过 tslib 引入 helper 函数，文件必须是模块
-
-      // "downlevelIteration": true,    // 降级遍历器的实现（es3/5）
-
-      // "strict": true,                        // 开启所有严格的类型检查
-      // "alwaysStrict": false,                 // 在代码中注入 "use strict";
-      // "noImplicitAny": false,                // 不允许隐式的 any 类型
-      // "strictNullChecks": false,             // 不允许把 null、undefined 赋值给其他类型变量
-      // "strictFunctionTypes": false           // 不允许函数参数双向协变
-      // "strictPropertyInitialization": false, // 类的实例属性必须初始化
-      // "strictBindCallApply": false,          // 严格的 bind/call/apply 检查
-      // "noImplicitThis": false,               // 不允许 this 有隐式的 any 类型
-
-      // "noUnusedLocals": true,                // 检查只声明，未使用的局部变量
-      // "noUnusedParameters": true,            // 检查未使用的函数参数
-      // "noFallthroughCasesInSwitch": true,    // 防止 switch 语句贯穿
-      // "noImplicitReturns": true,             // 每个分支都要有返回值
-
-      // "esModuleInterop": true,               // 允许 export = 导出，由import from 导入
-      // "allowUmdGlobalAccess": true,          // 允许在模块中访问 UMD 全局变量
-      // "moduleResolution": "node",            // 模块解析策略
-      // "baseUrl": "./",                       // 解析非相对模块的基地址
-      // "paths": {                             // 路径映射，相对于 baseUrl
-      //   "jquery": ["node_modules/jquery/dist/jquery.slim.min.js"]
-      // },
-      // "rootDirs": ["src", "out"],            // 将多个目录放在一个虚拟目录下，用于运行时
-
-      // "listEmittedFiles": true,        // 打印输出的文件
-      // "listFiles": true,               // 打印编译的文件（包括引用的声明文件）
-  }
-}
-```
-
-## ts3 新特性 工程引用
-
-以一个可能混杂多个工程（客户端代码、服务端代码、抽取的公共代码，但是只有一个 tsconfig.json 配置的项目的目录结构为例：
-```
-src
-  |--common
-      |--index.ts
-  |--client
-      |--index.ts
-  |--server
-      |--index.ts
-test
-  |--client.test.ts
-  |--server.test.ts
-tsconfig.json
-```
-
-存在问题：
-1. 打包后的目录 dist 存在 src 和 test 目录，但事实上 test 不应该打包到 dist 目录
-  - 如果要去掉 test 只能通过配置 include:"src" 或者 exclude:"test"，但是这样会带来 test 不编译，我们的目的还是要编译 test，只是不输出到 dist 目录
-2. 不能单独的构建 server 或者 client 或者 test
-
-通过工程引用进行优化，不仅可以更灵活的指定输出目录，还可以将原来的大工程进行拆分，拆分出来的多个小工程每个可以单独编译，也可以指定其他工程的依赖，编译的时候一起编译，同时还能指定增量编译提高编译速度。
-
-新目录结构，server client test 都拆分成单独的工程，每个都有自己的 tsconfig.json 配置：
-```
-src
-  |--common
-      |--index.ts
-      |--tsconfig.json
-  |--client
-      |--index.ts
-      |--tsconfig.json
-  |--server
-      |--index.ts
-      |--tsconfig.json
-test
-  |--client.test.ts
-  |--server.test.ts
-  |--tsconfig.json
-tsconfig.json
-```
-
-最外层 tsconfig.json 配置必须要有
-```json
-{
-  "compilerOptions": {
-    "composite": true, // 工程可以被引用和进行增量编译
-    "declaration": true // 必须开启
-  }
-}
-```
-拆分的子工程通过 extends 继承外层配置，可以单独指定 outDir 输出目录，通过 reference 指定依赖的其他工程。
-```json
-{
-    "extends": "../../tsconfig.json",
-    "compilerOptions": {
-        "outDir": "../../dist/server",
-    },
-    "references": [
-        {
-            "path": "../common"
-        }
-    ]
-}
-```
-
-需要注意构建的时候应当使用 --build 模式，也可以简写为 -b 然后接要构建的工程目录，比如：`tsc -b src/server --verbose` (--verbose 开启打印构建信息) 由于会开启增量编译，所以第二次编译会快很多。同时由于 server 依赖 common ，所以 common 也会被编译。输出的文件可以开启 `--clean` 进行清理。
-
-如果不使用 --build 模式，直接运行 `tsc` 编译，那么会把当前目录下的所有 ts 在相同位置编译生成 js 文件，同时由于开启了 "declaration":true 也会生成 .d.ts 声明文件。 
-
-总结：工程引用解决了
-- 构建输出目录可以自定义
-- 单个工程可以单独构建
-- 开启增量编译提高编译速度
-
-[microsoft/TypeScript](https://github.com/microsoft/TypeScript) 官方代码库已启用工程引用，可以参考官方配置探索 ts 本身项目是如何组织和编译的。
