@@ -1,58 +1,32 @@
-# 编译工具 ts-loader 和 babel
+# 代码检查 TSLint 和 ESLint
 
-## ts-loader
+TSLint 不用学了，官方都已经宣布转向 ESLint
 
-1. 内部用的 `tsc` 编译，官网血统，新项目推荐用。
-2. transpileOnly 选项，开启后只做编译不做类型检查
-3. 配合 fork-ts-checker-webpack-plugin 独立的类型检查进程
+## Lint 存在的必要性
 
-## awesome-typescript-loader
+有了类型检查为什么还要 Lint？
+1. 保持团队开发风格统一
+2. Lint 也有助于检查一些类型错误
 
-针对官网编译器编译速度太慢，做了缓存和优化，更适合和 babel 集成
+## TSLint 和 ESLint
 
-1. 内置独立的类型检查进程 (CheckerPlugin)
-2. transpileOnly 选项同 ts-loader
+顾名思义，分别是 TS 和 ES 的 Lint 规则集。由于 ESLint 社区已经有很成熟的生态，所以官方也宣布从 TSLint 转向 ESlint，避免再多开发一套工具同时也利于融入社区，有助于社区工作者开发针对 ts 的工作等。
 
-## 两者对比
+ESLint 的工作流程：
+`code -> es AST -> 语法、风格检查 -> 结果`
 
-主要从编译时间(ms)对比
+TSLint 的工作流程：
+`code -> ts AST -> 语法、风格检查 + 类型检查、语言转换 -> 结果`
 
-| loader | 默认配置 | 开启 transpileOnly | transpileOnly + 独立类型检查 
-| ------ | ----- | ----- |  ----- |
-| ts-loader | 1600+ | 500+ | 3000+(fork-ts-checker-webpack-plugin 时间还变长了...)
-| awesome-typescript-loader | 2200+ | 1600+ | 1600+( CheckerPlugin() 类型检查有遗漏)
-
-## babel
-
-利用  babel 强大的生态插件做 ts 的编译，需要用到的插件有：
-- `@babel/preset-typescript`
-- `@babel/plugin-proposal-class-properties` 这个插件用来支持写 class
-- `@babel/plugin-proposal-object-rest-spread` 这个插件用来支持 ... 扩展运算符
-
-由于 babel 只做 ts 的编译，也就是语言转换，所以需要单独一个进程开启来做类型检查，这里还是用 `tsc --watch ` 模式随时对修改的文件做类型检查。
-
-同时 babel 存在无法编译的 ts 特性，分别有：
-1. namespace
-    >不要在 babel 编译 ts 的项目里写命名空间
-2. `<typename>` 类型断言
-    > 改用 as 关键字做类型断言 `as typename`
-3. const enum
-    > 以后会支持
-4. export = 
-    > 不写这个语法
+可以看到 TSLint 是要多做一个类型检查和语言转换的功能的，同时由于 es AST 和 ts AST 语法树不兼容，所以 ts 无法直接复用生态丰富的 eslint 社区的工作。这也是为什么官方要迁移到 eslint 的原因。对于 AST 语法树的不兼容，官方提供了 `typescript-eslint` 这个插件使得  ts AST 可以转化为 es AST(es Tree)，从而复用 eslint 生态。
 
 
-babel7 之前
-- ts -> tsc(ts-loader/awesome-typescript-loader) -> js -> babel -> js
 
-babel7 之后
-- ts -> babel -> js + tsc 单独做类型检查
+## 实践
+npm 安装相关依赖 
+`npm i -D eslint @typescript-eslint/eslint-plugin @typescript-eslint/parser`
 
-在使用 tsc 只做类型检查的时候，要配置 
-```json
-{
-    "compilerOptions": {
-        "noEmit": true // 不输出任何文件
-    }
-}
-```
+配置 .eslintrc.json
+
+
+
