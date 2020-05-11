@@ -13,7 +13,17 @@
 1. 内置独立的类型检查进程 (CheckerPlugin)
 2. transpileOnly 选项同 ts-loader
 
+## 两者对比
+
+主要从编译时间(ms)对比
+
+| loader | 默认配置 | 开启 transpileOnly | transpileOnly + 独立类型检查 
+| ------ | ----- | ----- |  ----- |
+| ts-loader | 1600+ | 500+ | 3000+(fork-ts-checker-webpack-plugin 时间还变长了...)
+| awesome-typescript-loader | 2200+ | 1600+ | 1600+( CheckerPlugin() 类型检查有遗漏)
+
 ## babel
+
 利用  babel 强大的生态插件做 ts 的编译，需要用到的插件有：
 - `@babel/preset-typescript`
 - `@babel/proposal-class-properties` 这个插件用来支持写 class
@@ -31,3 +41,9 @@
 4. export = 
     > 不写这个语法
 
+
+babel7 之前
+- ts -> tsc(ts-loader/awesome-typescript-loader) -> js -> babel -> js
+
+babel7 之后
+- ts -> babel -> js + tsc 单独做类型检查
