@@ -20,3 +20,4 @@
     - ts3 新特性：工程引用
 - [demo-14](https://github.com/lalalazero/learn-typescript/blob/demo-14/note.md) 编译工具：ts-loader 和 babel
 - [demo-15](https://github.com/lalalazero/learn-typescript/blob/demo-15/note.md) 代码检查：TSLint 和 ESLint
+- [demo-16](https://github.com/lalalazero/learn-typescript/blob/demo-16/note.md) jest 进行测试
