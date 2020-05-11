@@ -29,4 +29,16 @@ npm 安装相关依赖
 配置 .eslintrc.json
 
 
+## 利用 IDE 的插件 ESLint
+编辑 settings.json ，<del>配置 eslint.autoFixOnSave 自动修复</del> 根据最新的更新，要改成这样写了
+```json
+{
+    "editor.codeActionsOnSave": {
+        "source.fixAll.eslint": true
+    }
+}
+ 
+```
+
+
 
