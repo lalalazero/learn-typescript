@@ -47,3 +47,12 @@ babel7 之前
 
 babel7 之后
 - ts -> babel -> js + tsc 单独做类型检查
+
+在使用 tsc 只做类型检查的时候，要配置 
+```json
+{
+    "compilerOptions": {
+        "noEmit": true // 不输出任何文件
+    }
+}
+```

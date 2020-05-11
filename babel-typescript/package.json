@@ -5,8 +5,8 @@
   "main": "./src/index.ts",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "build": "babel src --out-dir dist --extensions \".ts,.tsx\""
-    
+    "build": "babel src --out-dir dist --extensions \".ts,.tsx\"",
+    "type-check": "tsc --watch"
   },
   "keywords": [],
   "author": "",
@@ -17,6 +17,7 @@
     "@babel/plugin-proposal-class-properties": "^7.8.3",
     "@babel/plugin-proposal-object-rest-spread": "^7.9.6",
     "@babel/preset-env": "^7.9.6",
-    "@babel/preset-typescript": "^7.9.0"
+    "@babel/preset-typescript": "^7.9.0",
+    "typescript": "^3.8.3"
   }
 }
